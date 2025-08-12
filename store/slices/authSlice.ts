@@ -5,6 +5,7 @@ export interface User {
   name: string;
   email: string;
   phone: string;
+  password: string; // Added password field for authentication
   role: 'doctor' | 'patient';
   avatar?: string;
   // Doctor specific fields
@@ -41,6 +42,7 @@ interface AuthState {
   token: string | null;
   availableSlots: TimeSlot[];
   doctorSlots: TimeSlot[]; // For doctors to manage their own slots
+  registeredUsers: User[]; // Store all registered users
 }
 
 const initialState: AuthState = {
@@ -51,6 +53,7 @@ const initialState: AuthState = {
   token: null,
   availableSlots: [],
   doctorSlots: [],
+  registeredUsers: [], // Start with empty array - users register through signup
 };
 
 const authSlice = createSlice({
@@ -58,24 +61,95 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setLoading: (state, action: PayloadAction<boolean>) => {
+      console.log("⏳ REDUX: setLoading called with:", action.payload);
       state.loading = action.payload;
     },
     setError: (state, action: PayloadAction<string | null>) => {
+      console.log("🔴 REDUX: setError called with:", action.payload);
       state.error = action.payload;
     },
     loginSuccess: (state, action: PayloadAction<{ user: User; token: string }>) => {
+      console.log("🔵 REDUX: loginSuccess called with:", {
+        userId: action.payload.user.id,
+        userName: action.payload.user.name,
+        userEmail: action.payload.user.email,
+        userRole: action.payload.user.role,
+        token: action.payload.token,
+      });
+      
       state.user = action.payload.user;
       state.token = action.payload.token;
       state.isAuthenticated = true;
       state.loading = false;
       state.error = null;
+      
+      console.log("🔵 REDUX: loginSuccess completed. New state:", {
+        isAuthenticated: state.isAuthenticated,
+        userId: state.user?.id,
+        loading: state.loading,
+        error: state.error,
+      });
     },
     signupSuccess: (state, action: PayloadAction<{ user: User; token: string }>) => {
-      state.user = action.payload.user;
+      console.log("🔵 REDUX: signupSuccess called with:", {
+        userId: action.payload.user.id,
+        userName: action.payload.user.name,
+        userEmail: action.payload.user.email,
+        userRole: action.payload.user.role,
+        token: action.payload.token,
+        currentRegisteredUsersCount: state.registeredUsers.length,
+      });
+      
+      const newUser = action.payload.user;
+      // Add user to registered users if not already exists
+      const existingUser = state.registeredUsers.find(u => u.email === newUser.email);
+      
+      if (!existingUser) {
+        console.log("✅ Adding new user to registered users");
+        state.registeredUsers.push(newUser);
+      } else {
+        console.log("⚠️ User already exists in registered users, not adding duplicate");
+      }
+      
+      state.user = newUser;
       state.token = action.payload.token;
       state.isAuthenticated = true;
       state.loading = false;
       state.error = null;
+      
+      console.log("🔵 REDUX: signupSuccess completed. New state:", {
+        isAuthenticated: state.isAuthenticated,
+        userId: state.user?.id,
+        registeredUsersCount: state.registeredUsers.length,
+        loading: state.loading,
+        error: state.error,
+      });
+    },
+    registerUser: (state, action: PayloadAction<User>) => {
+      const newUser = action.payload;
+      // Check if user already exists
+      const existingUser = state.registeredUsers.find(u => u.email === newUser.email);
+      if (!existingUser) {
+        state.registeredUsers.push(newUser);
+      }
+    },
+    authenticateUser: (state, action: PayloadAction<{ email: string; password: string }>) => {
+      const { email, password } = action.payload;
+      const user = state.registeredUsers.find(u => 
+        u.email.toLowerCase() === email.toLowerCase() && 
+        u.password === password
+      );
+      
+      if (user) {
+        state.user = { ...user };
+        state.token = `token-${user.id}`;
+        state.isAuthenticated = true;
+        state.loading = false;
+        state.error = null;
+      } else {
+        state.error = 'Invalid email or password';
+        state.loading = false;
+      }
     },
     logout: (state) => {
       state.user = null;
@@ -85,6 +159,7 @@ const authSlice = createSlice({
       state.error = null;
       state.availableSlots = [];
       state.doctorSlots = [];
+      // Keep registered users for persistence
     },
     updateUser: (state, action: PayloadAction<Partial<User>>) => {
       if (state.user) {
@@ -115,6 +190,10 @@ const authSlice = createSlice({
     setDoctorSlots: (state, action: PayloadAction<TimeSlot[]>) => {
       state.doctorSlots = action.payload;
     },
+    resetAllState: (state) => {
+      // Reset to initial state
+      return initialState;
+    },
   },
 });
 
@@ -123,6 +202,8 @@ export const {
   setError,
   loginSuccess,
   signupSuccess,
+  registerUser,
+  authenticateUser,
   logout,
   updateUser,
   clearError,
@@ -131,6 +212,7 @@ export const {
   deleteTimeSlot,
   setAvailableSlots,
   setDoctorSlots,
+  resetAllState,
 } = authSlice.actions;
 
 export default authSlice.reducer;

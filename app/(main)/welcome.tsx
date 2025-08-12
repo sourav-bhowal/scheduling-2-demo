@@ -1,6 +1,8 @@
 import { Redirect, router } from "expo-router";
 import { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import AuthDebugInfo from "../../components/AuthDebugInfo";
+import QuickTestSignup from "../../components/QuickTestSignup";
 import RoleSelectionModal from "../../components/RoleSelectionModal";
 import { useAppSelector } from "../../store/hooks";
 
@@ -20,11 +22,19 @@ export default function WelcomeScreen() {
 
   const handleRoleSelect = (role: "doctor" | "patient") => {
     setShowRoleModal(false);
-    router.push(`/auth/${role}-${actionType}`);
+    router.push(`/${role}-${actionType}`);
   };
 
   return (
     <View className="flex-1 bg-neutral-200">
+      {/* Debug components for testing */}
+      {__DEV__ && (
+        <>
+          <AuthDebugInfo show={true} />
+          {/* <QuickTestSignup show={true} /> */}
+        </>
+      )}
+      
       <View className="flex-1 justify-center items-center px-6">
         {/* Logo/Title */}
         <View className="items-center mb-16">

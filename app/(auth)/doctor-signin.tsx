@@ -1,18 +1,30 @@
-import { Link, router } from 'expo-router';
-import { useState } from 'react';
-import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { clearError, loginSuccess, setError, setLoading, User } from '@/store/slices/authSlice';
+import { store } from "@/store";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import {
+  authenticateUser,
+  clearError,
+  setError,
+  setLoading,
+} from "@/store/slices/authSlice";
+import { Link, router } from "expo-router";
+import { useState } from "react";
+import {
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function DoctorSignIn() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const dispatch = useAppDispatch();
   const { loading, error } = useAppSelector((state) => state.auth);
 
   const handleSignIn = async () => {
     if (!email || !password) {
-      dispatch(setError('Please fill in all fields'));
+      dispatch(setError("Please fill in all fields"));
       return;
     }
 
@@ -20,33 +32,28 @@ export default function DoctorSignIn() {
     dispatch(clearError());
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Mock successful login
-      const mockUser: User = {
-        id: '1',
-        name: 'Dr. Sarah Johnson',
-        email: email,
-        phone: '+1234567890',
-        role: 'doctor',
-        specialization: 'Cardiologist',
-        licenseNumber: 'MD123456',
-        clinicName: 'Heart Care Clinic',
-        clinicAddress: '123 Medical Center Dr',
-        experience: 10,
-        consultationFee: 150,
-      };
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      dispatch(loginSuccess({
-        user: mockUser,
-        token: 'mock-jwt-token'
-      }));
+      // Use Redux store authentication
+      dispatch(authenticateUser({ email, password }));
 
-      router.replace('/doctor-dashboard');
-    } catch (err) {
-      dispatch(setError('Invalid email or password'));
-    } finally {
+      // Check if authentication was successful
+      // We'll need to check the auth state after dispatch
+      setTimeout(() => {
+        const currentState = store.getState();
+        if (
+          currentState.auth.isAuthenticated &&
+          currentState.auth.user?.role === "doctor"
+        ) {
+          router.replace("/doctor-dashboard");
+        } else if (!currentState.auth.error) {
+          dispatch(setError("Access denied. Doctor account required."));
+        }
+        dispatch(setLoading(false));
+      }, 100);
+    } catch {
+      dispatch(setError("Authentication failed. Please try again."));
       dispatch(setLoading(false));
     }
   };
@@ -59,7 +66,9 @@ export default function DoctorSignIn() {
           <View className="w-20 h-20 bg-blue-100 rounded-full items-center justify-center mb-4">
             <Text className="text-3xl">👩‍⚕️</Text>
           </View>
-          <Text className="text-2xl font-bold text-gray-800 mb-2">Doctor Sign In</Text>
+          <Text className="text-2xl font-bold text-gray-800 mb-2">
+            Doctor Sign In
+          </Text>
           <Text className="text-gray-600 text-center">
             Access your practice management dashboard
           </Text>
@@ -68,7 +77,9 @@ export default function DoctorSignIn() {
         {/* Form */}
         <View className="space-y-4">
           <View>
-            <Text className="text-sm font-medium text-gray-700 mb-2">Email Address</Text>
+            <Text className="text-sm font-medium text-gray-700 mb-2">
+              Email Address
+            </Text>
             <TextInput
               value={email}
               onChangeText={setEmail}
@@ -80,7 +91,9 @@ export default function DoctorSignIn() {
           </View>
 
           <View>
-            <Text className="text-sm font-medium text-gray-700 mb-2">Password</Text>
+            <Text className="text-sm font-medium text-gray-700 mb-2">
+              Password
+            </Text>
             <TextInput
               value={password}
               onChangeText={setPassword}
@@ -99,10 +112,10 @@ export default function DoctorSignIn() {
           <TouchableOpacity
             onPress={handleSignIn}
             disabled={loading}
-            className={`py-3 rounded-lg ${loading ? 'bg-gray-400' : 'bg-blue-500'}`}
+            className={`py-3 rounded-lg ${loading ? "bg-gray-400" : "bg-blue-500"}`}
           >
             <Text className="text-white text-center font-semibold">
-              {loading ? 'Signing In...' : 'Sign In'}
+              {loading ? "Signing In..." : "Sign In"}
             </Text>
           </TouchableOpacity>
 
@@ -115,7 +128,7 @@ export default function DoctorSignIn() {
         <View className="mt-8">
           <View className="flex-row justify-center items-center">
             <Text className="text-gray-600">Don&apos;t have an account? </Text>
-            <Link href="/auth/doctor-signup" asChild>
+            <Link href="/doctor-signup" asChild>
               <TouchableOpacity>
                 <Text className="text-blue-500 font-semibold">Sign Up</Text>
               </TouchableOpacity>
@@ -125,7 +138,9 @@ export default function DoctorSignIn() {
           <View className="mt-6">
             <Link href="/welcome" asChild>
               <TouchableOpacity className="py-2">
-                <Text className="text-gray-500 text-center">← Back to Role Selection</Text>
+                <Text className="text-gray-500 text-center">
+                  ← Back to Role Selection
+                </Text>
               </TouchableOpacity>
             </Link>
           </View>

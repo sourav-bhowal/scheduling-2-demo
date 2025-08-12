@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import CustomDatePicker from '../../components/CustomDatePicker';
+import TimePicker from '../../components/TimePicker';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { addTimeSlot, deleteTimeSlot, TimeSlot } from '../../store/slices/authSlice';
 
@@ -105,32 +107,33 @@ export default function ManageAvailability() {
             
             <View className="space-y-4">
               <View>
-                <Text className="text-sm font-medium text-gray-700 mb-2">Date *</Text>
-                <TextInput
+                <CustomDatePicker
                   value={newSlot.date}
-                  onChangeText={(text) => setNewSlot(prev => ({...prev, date: text}))}
-                  placeholder="YYYY-MM-DD"
-                  className="bg-gray-50 border border-gray-300 rounded-lg px-4 py-3"
+                  onDateChange={(date) => setNewSlot(prev => ({...prev, date}))}
+                  label="Date"
+                  placeholder="Select date"
+                  minimumDate={new Date()}
+                  required
                 />
               </View>
 
               <View className="flex-row space-x-3">
                 <View className="flex-1">
-                  <Text className="text-sm font-medium text-gray-700 mb-2">Start Time *</Text>
-                  <TextInput
+                  <TimePicker
                     value={newSlot.startTime}
-                    onChangeText={(text) => setNewSlot(prev => ({...prev, startTime: text}))}
-                    placeholder="HH:MM"
-                    className="bg-gray-50 border border-gray-300 rounded-lg px-4 py-3"
+                    onTimeChange={(time) => setNewSlot(prev => ({...prev, startTime: time}))}
+                    label="Start Time"
+                    placeholder="Select start time"
+                    required
                   />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-sm font-medium text-gray-700 mb-2">End Time *</Text>
-                  <TextInput
+                  <TimePicker
                     value={newSlot.endTime}
-                    onChangeText={(text) => setNewSlot(prev => ({...prev, endTime: text}))}
-                    placeholder="HH:MM"
-                    className="bg-gray-50 border border-gray-300 rounded-lg px-4 py-3"
+                    onTimeChange={(time) => setNewSlot(prev => ({...prev, endTime: time}))}
+                    label="End Time"
+                    placeholder="Select end time"
+                    required
                   />
                 </View>
               </View>

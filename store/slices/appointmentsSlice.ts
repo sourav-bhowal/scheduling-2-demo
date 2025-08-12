@@ -98,6 +98,10 @@ const appointmentsSlice = createSlice({
     setAppointments: (state, action: PayloadAction<Appointment[]>) => {
       state.appointments = action.payload;
     },
+    resetAllAppointmentsState: (state) => {
+      // Reset to initial state
+      return initialState;
+    },
   },
 });
 
@@ -112,6 +116,7 @@ export const {
   setFilters,
   clearFilters,
   setAppointments,
+  resetAllAppointmentsState,
 } = appointmentsSlice.actions;
 
 export default appointmentsSlice.reducer;

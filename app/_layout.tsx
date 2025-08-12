@@ -23,10 +23,10 @@ export default function RootLayout() {
           }}
         >
           <Stack.Screen name="welcome" options={{ headerShown: false }} />
-          <Stack.Screen name="auth/doctor-signin" options={{ headerShown: false }} />
-          <Stack.Screen name="auth/doctor-signup" options={{ headerShown: false }} />
-          <Stack.Screen name="auth/patient-signin" options={{ headerShown: false }} />
-          <Stack.Screen name="auth/patient-signup" options={{ headerShown: false }} />
+          <Stack.Screen name="doctor-signin" options={{ headerShown: false }} />
+          <Stack.Screen name="doctor-signup" options={{ headerShown: false }} />
+          <Stack.Screen name="patient-signin" options={{ headerShown: false }} />
+          <Stack.Screen name="patient-signup" options={{ headerShown: false }} />
           <Stack.Screen name="doctor-dashboard" options={{ headerShown: false }} />
           <Stack.Screen name="patient-dashboard" options={{ headerShown: false }} />
           <Stack.Screen name="manage-availability" options={{ headerShown: false }} />

@@ -1,8 +1,9 @@
+import { store } from '@/store';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { authenticateUser, clearError, setError, setLoading } from '@/store/slices/authSlice';
 import { Link, router } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { clearError, loginSuccess, setError, setLoading, User } from '@/store/slices/authSlice';
 
 export default function PatientSignIn() {
   const [email, setEmail] = useState('');
@@ -20,31 +21,25 @@ export default function PatientSignIn() {
     dispatch(clearError());
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Mock successful login
-      const mockUser: User = {
-        id: '2',
-        name: 'John Doe',
-        email: email,
-        phone: '+1234567890',
-        role: 'patient',
-        dateOfBirth: '1990-01-15',
-        gender: 'male',
-        emergencyContact: '+1987654321',
-        medicalHistory: ['Hypertension', 'Diabetes Type 2'],
-      };
-
-      dispatch(loginSuccess({
-        user: mockUser,
-        token: 'mock-jwt-token-patient'
-      }));
-
-      router.replace('/patient-dashboard');
-    } catch (err) {
-      dispatch(setError('Invalid email or password'));
-    } finally {
+      // Use Redux store authentication
+      dispatch(authenticateUser({ email, password }));
+      
+      // Check if authentication was successful
+      setTimeout(() => {
+        const currentState = store.getState();
+        if (currentState.auth.isAuthenticated && currentState.auth.user?.role === 'patient') {
+          router.replace('/patient-dashboard');
+        } else if (!currentState.auth.error) {
+          dispatch(setError('Access denied. Patient account required.'));
+        }
+        dispatch(setLoading(false));
+      }, 100);
+      
+    } catch {
+      dispatch(setError('Authentication failed. Please try again.'));
       dispatch(setLoading(false));
     }
   };
@@ -113,7 +108,7 @@ export default function PatientSignIn() {
         <View className="mt-8">
           <View className="flex-row justify-center items-center">
             <Text className="text-gray-600">Don&apos;t have an account? </Text>
-            <Link href="/auth/patient-signup" asChild>
+            <Link href="/patient-signup" asChild>
               <TouchableOpacity>
                 <Text className="text-green-500 font-semibold">Sign Up</Text>
               </TouchableOpacity>

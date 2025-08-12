@@ -1,3 +1,12 @@
+import { store } from "@/store";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import {
+  clearError,
+  setError,
+  setLoading,
+  signupSuccess,
+  User
+} from "@/store/slices/authSlice";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import {
@@ -7,14 +16,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import {
-  clearError,
-  setError,
-  setLoading,
-  signupSuccess,
-  User,
-} from "@/store/slices/authSlice";
+import AuthDebugInfo from "../../components/AuthDebugInfo";
 
 export default function DoctorSignUp() {
   const [formData, setFormData] = useState({
@@ -39,39 +41,85 @@ export default function DoctorSignUp() {
   };
 
   const handleSignUp = async () => {
+    console.log("🔷 DOCTOR SIGNUP STARTED");
+    console.log("📝 Form Data:", {
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      hasPassword: !!formData.password,
+      hasConfirmPassword: !!formData.confirmPassword,
+      specialization: formData.specialization,
+      licenseNumber: formData.licenseNumber,
+    });
+
+    // Validation checks with detailed logging
     if (
       !formData.name ||
       !formData.email ||
       !formData.password ||
       !formData.phone
     ) {
-      dispatch(setError("Please fill in all required fields"));
+      const missingFields = [];
+      if (!formData.name) missingFields.push("name");
+      if (!formData.email) missingFields.push("email");
+      if (!formData.password) missingFields.push("password");
+      if (!formData.phone) missingFields.push("phone");
+      
+      console.log("❌ Missing required fields:", missingFields);
+      dispatch(setError("Please fill in all required fields: " + missingFields.join(", ")));
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
+      console.log("❌ Password mismatch");
       dispatch(setError("Passwords do not match"));
       return;
     }
 
     if (formData.password.length < 6) {
+      console.log("❌ Password too short:", formData.password.length, "characters");
       dispatch(setError("Password must be at least 6 characters"));
       return;
     }
 
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      console.log("❌ Invalid email format:", formData.email);
+      dispatch(setError("Please enter a valid email address"));
+      return;
+    }
+
+    console.log("✅ All validations passed");
     dispatch(setLoading(true));
     dispatch(clearError());
 
     try {
+      console.log("⏳ Starting signup process...");
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // Mock successful signup
+      // Check if email already exists in registered users
+      const currentState = store.getState();
+      console.log("📊 Current registered users count:", currentState.auth.registeredUsers?.length);
+      console.log("👥 Registered users:", currentState.auth.registeredUsers?.map(u => ({ email: u.email, role: u.role })));
+      
+      const existingUser = currentState.auth.registeredUsers?.find(
+        (user: User) => user.email.toLowerCase() === formData.email.toLowerCase()
+      );
+
+      if (existingUser) {
+        console.log("❌ Email already exists:", existingUser.email, "Role:", existingUser.role);
+        throw new Error('Email already exists');
+      }
+
+      // Create new user
       const newUser: User = {
         id: Date.now().toString(),
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
+        password: formData.password,
         role: "doctor",
         specialization: formData.specialization,
         licenseNumber: formData.licenseNumber,
@@ -81,23 +129,50 @@ export default function DoctorSignUp() {
         consultationFee: parseFloat(formData.consultationFee) || 0,
       };
 
+      console.log("👤 Created new doctor user:", {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
+      });
+
+      console.log("🚀 Dispatching signupSuccess...");
       dispatch(
         signupSuccess({
           user: newUser,
-          token: "mock-jwt-token",
+          token: `token-${newUser.id}`,
         })
       );
 
+      console.log("🏥 Redirecting to doctor dashboard...");
       router.replace("/doctor-dashboard");
-    } catch (err) {
-      dispatch(setError("Registration failed. Please try again."));
+    } catch (error) {
+      console.log("💥 Signup error:", error);
+      if (error instanceof Error) {
+        console.log("📋 Error details:", {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+        });
+        
+        if (error.message === 'Email already exists') {
+          dispatch(setError("Email already registered. Please use a different email or sign in."));
+        } else {
+          dispatch(setError(`Registration failed: ${error.message}`));
+        }
+      } else {
+        console.log("🤷 Unknown error type:", typeof error, error);
+        dispatch(setError("Registration failed. Please try again."));
+      }
     } finally {
+      console.log("🔚 Signup process completed, setting loading to false");
       dispatch(setLoading(false));
     }
   };
 
   return (
     <ScrollView className="flex-1 bg-white">
+      <AuthDebugInfo show={true} />
       <View className="flex-1 px-6 py-8">
         {/* Header */}
         <View className="items-center mb-6">
@@ -297,7 +372,7 @@ export default function DoctorSignUp() {
         <View className="mt-6">
           <View className="flex-row justify-center items-center">
             <Text className="text-gray-600">Already have an account? </Text>
-            <Link href="/auth/doctor-signin" asChild>
+            <Link href="/doctor-signin" asChild>
               <TouchableOpacity>
                 <Text className="text-blue-500 font-semibold">Sign In</Text>
               </TouchableOpacity>

@@ -1,20 +1,23 @@
+import { store } from "@/store";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import {
+  clearError,
+  setError,
+  setLoading,
+  signupSuccess,
+  User,
+} from "@/store/slices/authSlice";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import {
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import {
-    clearError,
-    setError,
-    setLoading,
-    signupSuccess,
-    User,
-} from "@/store/slices/authSlice";
+import AuthDebugInfo from "../../components/AuthDebugInfo";
+import CustomDatePicker from "../../components/CustomDatePicker";
 
 export default function PatientSignUp() {
   const [formData, setFormData] = useState({
@@ -37,39 +40,85 @@ export default function PatientSignUp() {
   };
 
   const handleSignUp = async () => {
+    console.log("🔷 PATIENT SIGNUP STARTED");
+    console.log("📝 Form Data:", {
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      hasPassword: !!formData.password,
+      hasConfirmPassword: !!formData.confirmPassword,
+      dateOfBirth: formData.dateOfBirth,
+      gender: formData.gender,
+    });
+
+    // Validation checks with detailed logging
     if (
       !formData.name ||
       !formData.email ||
       !formData.password ||
       !formData.phone
     ) {
-      dispatch(setError("Please fill in all required fields"));
+      const missingFields = [];
+      if (!formData.name) missingFields.push("name");
+      if (!formData.email) missingFields.push("email");
+      if (!formData.password) missingFields.push("password");
+      if (!formData.phone) missingFields.push("phone");
+      
+      console.log("❌ Missing required fields:", missingFields);
+      dispatch(setError("Please fill in all required fields: " + missingFields.join(", ")));
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
+      console.log("❌ Password mismatch");
       dispatch(setError("Passwords do not match"));
       return;
     }
 
     if (formData.password.length < 6) {
+      console.log("❌ Password too short:", formData.password.length, "characters");
       dispatch(setError("Password must be at least 6 characters"));
       return;
     }
 
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      console.log("❌ Invalid email format:", formData.email);
+      dispatch(setError("Please enter a valid email address"));
+      return;
+    }
+
+    console.log("✅ All validations passed");
     dispatch(setLoading(true));
     dispatch(clearError());
 
     try {
+      console.log("⏳ Starting signup process...");
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // Mock successful signup
+      // Check if email already exists in registered users
+      const currentState = store.getState();
+      console.log("📊 Current registered users count:", currentState.auth.registeredUsers.length);
+      console.log("👥 Registered users:", currentState.auth.registeredUsers.map(u => ({ email: u.email, role: u.role })));
+      
+      const existingUser = currentState.auth.registeredUsers.find(
+        (user: User) => user.email.toLowerCase() === formData.email.toLowerCase()
+      );
+
+      if (existingUser) {
+        console.log("❌ Email already exists:", existingUser.email, "Role:", existingUser.role);
+        throw new Error('Email already exists');
+      }
+
+      // Create new user
       const newUser: User = {
         id: Date.now().toString(),
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
+        password: formData.password,
         role: "patient",
         dateOfBirth: formData.dateOfBirth,
         gender: formData.gender as "male" | "female" | "other",
@@ -80,23 +129,51 @@ export default function PatientSignUp() {
           .filter((item) => item),
       };
 
+      console.log("👤 Created new patient user:", {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
+        medicalHistoryCount: newUser.medicalHistory?.length || 0,
+      });
+
+      console.log("🚀 Dispatching signupSuccess...");
       dispatch(
         signupSuccess({
           user: newUser,
-          token: "mock-jwt-token-patient",
+          token: `token-${newUser.id}`,
         })
       );
 
+      console.log("🏥 Redirecting to patient dashboard...");
       router.replace("/patient-dashboard");
-    } catch {
-      dispatch(setError("Registration failed. Please try again."));
+    } catch (error) {
+      console.log("💥 Signup error:", error);
+      if (error instanceof Error) {
+        console.log("📋 Error details:", {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+        });
+        
+        if (error.message === 'Email already exists') {
+          dispatch(setError("Email already registered. Please use a different email or sign in."));
+        } else {
+          dispatch(setError(`Registration failed: ${error.message}`));
+        }
+      } else {
+        console.log("🤷 Unknown error type:", typeof error, error);
+        dispatch(setError("Registration failed. Please try again."));
+      }
     } finally {
+      console.log("🔚 Signup process completed, setting loading to false");
       dispatch(setLoading(false));
     }
   };
 
   return (
     <ScrollView className="flex-1 bg-white">
+      <AuthDebugInfo show={true} />
       <View className="flex-1 px-6 py-8">
         {/* Header */}
         <View className="items-center mb-6">
@@ -158,14 +235,12 @@ export default function PatientSignUp() {
           </View>
 
           <View>
-            <Text className="text-sm font-medium text-gray-700 mb-2">
-              Date of Birth
-            </Text>
-            <TextInput
+            <CustomDatePicker
               value={formData.dateOfBirth}
-              onChangeText={(value) => handleInputChange("dateOfBirth", value)}
-              placeholder="YYYY-MM-DD"
-              className="bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-gray-900"
+              onDateChange={(date) => handleInputChange("dateOfBirth", date)}
+              label="Date of Birth"
+              placeholder="Select your date of birth"
+              maximumDate={new Date()}
             />
           </View>
 
@@ -286,7 +361,7 @@ export default function PatientSignUp() {
         <View className="mt-6">
           <View className="flex-row justify-center items-center">
             <Text className="text-gray-600">Already have an account? </Text>
-            <Link href="/auth/patient-signin" asChild>
+            <Link href="/patient-signin" asChild>
               <TouchableOpacity>
                 <Text className="text-green-500 font-semibold">Sign In</Text>
               </TouchableOpacity>

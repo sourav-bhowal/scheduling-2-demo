@@ -1,24 +1,26 @@
-import { Link, router } from 'expo-router';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { logout } from '../../store/slices/authSlice';
+import { Link, router } from "expo-router";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { logout } from "../../store/slices/authSlice";
 
 export default function PatientDashboard() {
   const { user, availableSlots } = useAppSelector((state) => state.auth);
   const { appointments } = useAppSelector((state) => state.appointments);
   const dispatch = useAppDispatch();
 
-  if (!user || user.role !== 'patient') {
+  if (!user || user.role !== "patient") {
     return <Link href="/welcome" replace />;
   }
 
   const upcomingAppointments = (appointments || []).filter(
-    (apt) => apt.date >= new Date().toISOString().split('T')[0] && apt.status === 'scheduled'
+    (apt) =>
+      apt.date >= new Date().toISOString().split("T")[0] &&
+      apt.status === "scheduled"
   );
 
   const handleLogout = () => {
     dispatch(logout());
-    router.replace('/welcome');
+    router.replace("/welcome");
   };
 
   return (
@@ -27,10 +29,15 @@ export default function PatientDashboard() {
       <View className="bg-green-500 pt-12 pb-6 px-4">
         <View className="flex-row justify-between items-start mb-4">
           <View>
-            <Text className="text-white text-2xl font-bold mb-1">Hello, {user.name}</Text>
+            <Text className="text-white text-2xl font-bold mb-1">
+              Hello, {user.name}
+            </Text>
             <Text className="text-green-100">Patient Dashboard</Text>
           </View>
-          <TouchableOpacity onPress={handleLogout} className="bg-white/20 px-4 py-2 rounded-lg">
+          <TouchableOpacity
+            onPress={handleLogout}
+            className="bg-white/20 px-4 py-2 rounded-lg"
+          >
             <Text className="text-white font-semibold">Logout</Text>
           </TouchableOpacity>
         </View>
@@ -38,15 +45,21 @@ export default function PatientDashboard() {
         {/* Stats */}
         <View className="flex-row justify-between">
           <View className="bg-white/20 rounded-lg p-3 flex-1 mr-2">
-            <Text className="text-white text-lg font-semibold">{upcomingAppointments?.length || 0}</Text>
+            <Text className="text-white text-lg font-semibold">
+              {upcomingAppointments?.length || 0}
+            </Text>
             <Text className="text-white/80">Upcoming Appointments</Text>
           </View>
           <View className="bg-white/20 rounded-lg p-3 flex-1 mx-1">
-            <Text className="text-white text-lg font-semibold">{(availableSlots || []).length}</Text>
+            <Text className="text-white text-lg font-semibold">
+              {(availableSlots || []).length}
+            </Text>
             <Text className="text-white/80">Available Slots</Text>
           </View>
           <View className="bg-white/20 rounded-lg p-3 flex-1 ml-2">
-            <Text className="text-white text-lg font-semibold">{user.medicalHistory?.length || 0}</Text>
+            <Text className="text-white text-lg font-semibold">
+              {user.medicalHistory?.length || 0}
+            </Text>
             <Text className="text-white/80">Conditions</Text>
           </View>
         </View>
@@ -54,7 +67,9 @@ export default function PatientDashboard() {
 
       {/* Quick Actions */}
       <View className="p-4">
-        <Text className="text-xl font-bold text-gray-800 mb-4">Quick Actions</Text>
+        <Text className="text-xl font-bold text-gray-800 mb-4">
+          Quick Actions
+        </Text>
         <View className="space-y-3">
           <Link href="/book-appointment" asChild>
             <TouchableOpacity className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex-row items-center">
@@ -62,8 +77,12 @@ export default function PatientDashboard() {
                 <Text className="text-2xl">📅</Text>
               </View>
               <View className="flex-1">
-                <Text className="font-semibold text-gray-800">Book Appointment</Text>
-                <Text className="text-gray-600 text-sm">Schedule with available doctors</Text>
+                <Text className="font-semibold text-gray-800">
+                  Book Appointment
+                </Text>
+                <Text className="text-gray-600 text-sm">
+                  Schedule with available doctors
+                </Text>
               </View>
               <Text className="text-green-500 font-semibold">→</Text>
             </TouchableOpacity>
@@ -75,8 +94,12 @@ export default function PatientDashboard() {
                 <Text className="text-2xl">📋</Text>
               </View>
               <View className="flex-1">
-                <Text className="font-semibold text-gray-800">My Appointments</Text>
-                <Text className="text-gray-600 text-sm">View your appointment history</Text>
+                <Text className="font-semibold text-gray-800">
+                  My Appointments
+                </Text>
+                <Text className="text-gray-600 text-sm">
+                  View your appointment history
+                </Text>
               </View>
               <Text className="text-green-500 font-semibold">→</Text>
             </TouchableOpacity>
@@ -87,8 +110,12 @@ export default function PatientDashboard() {
               <Text className="text-2xl">🏥</Text>
             </View>
             <View className="flex-1">
-              <Text className="font-semibold text-gray-800">Medical Records</Text>
-              <Text className="text-gray-600 text-sm">View your health information</Text>
+              <Text className="font-semibold text-gray-800">
+                Medical Records
+              </Text>
+              <Text className="text-gray-600 text-sm">
+                View your health information
+              </Text>
             </View>
             <Text className="text-green-500 font-semibold">→</Text>
           </TouchableOpacity>
@@ -98,8 +125,12 @@ export default function PatientDashboard() {
               <Text className="text-2xl">👤</Text>
             </View>
             <View className="flex-1">
-              <Text className="font-semibold text-gray-800">Profile Settings</Text>
-              <Text className="text-gray-600 text-sm">Update your personal information</Text>
+              <Text className="font-semibold text-gray-800">
+                Profile Settings
+              </Text>
+              <Text className="text-gray-600 text-sm">
+                Update your personal information
+              </Text>
             </View>
             <Text className="text-green-500 font-semibold">→</Text>
           </TouchableOpacity>
@@ -108,26 +139,41 @@ export default function PatientDashboard() {
 
       {/* Upcoming Appointments */}
       <View className="p-4">
-        <Text className="text-xl font-bold text-gray-800 mb-4">Upcoming Appointments</Text>
+        <Text className="text-xl font-bold text-gray-800 mb-4">
+          Upcoming Appointments
+        </Text>
         {(upcomingAppointments?.length || 0) === 0 ? (
           <View className="bg-white p-6 rounded-lg border border-gray-200 items-center">
             <Text className="text-gray-500 mb-3">No upcoming appointments</Text>
             <Link href="/book-appointment" asChild>
               <TouchableOpacity className="bg-green-500 px-4 py-2 rounded-lg">
-                <Text className="text-white font-semibold">Book Your First Appointment</Text>
+                <Text className="text-white font-semibold">
+                  Book Your First Appointment
+                </Text>
               </TouchableOpacity>
             </Link>
           </View>
         ) : (
           <View className="space-y-3">
             {upcomingAppointments.slice(0, 3).map((appointment) => (
-              <View key={appointment.id} className="bg-white p-4 rounded-lg border border-gray-200">
+              <View
+                key={appointment.id}
+                className="bg-white p-4 rounded-lg border border-gray-200"
+              >
                 <View className="flex-row justify-between items-start mb-2">
-                  <Text className="font-semibold text-gray-800">{appointment.title}</Text>
-                  <Text className="text-green-600 font-medium">{appointment.time}</Text>
+                  <Text className="font-semibold text-gray-800">
+                    {appointment.title}
+                  </Text>
+                  <Text className="text-green-600 font-medium">
+                    {appointment.time}
+                  </Text>
                 </View>
-                <Text className="text-gray-600 text-sm mb-1">{appointment.date}</Text>
-                <Text className="text-gray-500 text-xs">{appointment.serviceType} • {appointment.duration} min</Text>
+                <Text className="text-gray-600 text-sm mb-1">
+                  {appointment.date}
+                </Text>
+                <Text className="text-gray-500 text-xs">
+                  {appointment.serviceType} • {appointment.duration} min
+                </Text>
               </View>
             ))}
           </View>
