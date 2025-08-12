@@ -1,14 +1,21 @@
-import { Text, View } from "react-native";
+import { Redirect } from "expo-router";
+import { useAppSelector } from "../store/hooks";
 
 export default function Index() {
-  return (
-    <View className="flex-1 items-center justify-center bg-blue-100">
-      <Text className="text-red-500 text-2xl font-bold">
-        Tailwind test: red & bold text.
-      </Text>
-      <Text className="mt-4 text-blue-600">
-        If this is not styled, NativeWind isn&apos;t running.
-      </Text>
-    </View>
-  );
+  const { user, isAuthenticated } = useAppSelector((state) => state.auth);
+
+  if (!isAuthenticated) {
+    return <Redirect href="/welcome" />;
+  }
+
+  if (user?.role === 'doctor') {
+    return <Redirect href="/doctor-dashboard" />;
+  }
+
+  if (user?.role === 'patient') {
+    return <Redirect href="/patient-dashboard" />;
+  }
+
+  // Fallback to welcome screen
+  return <Redirect href="/welcome" />;
 }
