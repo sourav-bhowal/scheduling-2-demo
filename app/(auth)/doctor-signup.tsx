@@ -5,7 +5,7 @@ import {
   setError,
   setLoading,
   signupSuccess,
-  User
+  User,
 } from "@/store/slices/authSlice";
 import { Link, router } from "expo-router";
 import { useState } from "react";
@@ -17,6 +17,7 @@ import {
   View,
 } from "react-native";
 import AuthDebugInfo from "../../components/AuthDebugInfo";
+import CustomMultiSelect from "../../components/CustomMultiSelect";
 
 export default function DoctorSignUp() {
   const [formData, setFormData] = useState({
@@ -25,13 +26,55 @@ export default function DoctorSignUp() {
     phone: "",
     password: "",
     confirmPassword: "",
-    specialization: "",
+    petSpecialization: [] as string[], // ['dogs', 'cats', 'birds', 'rabbits', 'reptiles', 'exotic']
+    medicalSpecialty: [] as string[], // ['general', 'surgery', 'dermatology', etc.]
+    languages: [] as string[], // ['english', 'spanish', 'french', etc.]
     licenseNumber: "",
     clinicName: "",
     clinicAddress: "",
     experience: "",
     consultationFee: "",
   });
+
+  // Dropdown options
+  const petSpeciesOptions = [
+    { label: 'Dogs', value: 'dogs' },
+    { label: 'Cats', value: 'cats' },
+    { label: 'Birds', value: 'birds' },
+    { label: 'Rabbits', value: 'rabbits' },
+    { label: 'Reptiles', value: 'reptiles' },
+    { label: 'Exotic Pets', value: 'exotic' },
+    { label: 'Farm Animals', value: 'farm' },
+    { label: 'Wildlife', value: 'wildlife' },
+  ];
+
+  const medicalSpecialtyOptions = [
+    { label: 'General Practice', value: 'general' },
+    { label: 'Surgery', value: 'surgery' },
+    { label: 'Dermatology', value: 'dermatology' },
+    { label: 'Cardiology', value: 'cardiology' },
+    { label: 'Oncology', value: 'oncology' },
+    { label: 'Orthopedics', value: 'orthopedics' },
+    { label: 'Ophthalmology', value: 'ophthalmology' },
+    { label: 'Dentistry', value: 'dentistry' },
+    { label: 'Emergency Care', value: 'emergency' },
+    { label: 'Animal Behavior', value: 'behavior' },
+    { label: 'Internal Medicine', value: 'internal' },
+    { label: 'Radiology', value: 'radiology' },
+  ];
+
+  const languageOptions = [
+    { label: 'English', value: 'english' },
+    { label: 'Spanish', value: 'spanish' },
+    { label: 'French', value: 'french' },
+    { label: 'German', value: 'german' },
+    { label: 'Mandarin', value: 'mandarin' },
+    { label: 'Hindi', value: 'hindi' },
+    { label: 'Arabic', value: 'arabic' },
+    { label: 'Portuguese', value: 'portuguese' },
+    { label: 'Italian', value: 'italian' },
+    { label: 'Japanese', value: 'japanese' },
+  ];
 
   const dispatch = useAppDispatch();
   const { loading, error } = useAppSelector((state) => state.auth);
@@ -48,7 +91,7 @@ export default function DoctorSignUp() {
       phone: formData.phone,
       hasPassword: !!formData.password,
       hasConfirmPassword: !!formData.confirmPassword,
-      specialization: formData.specialization,
+      specialization: formData.petSpecialization?.join(', ') || 'Not specified',
       licenseNumber: formData.licenseNumber,
     });
 
@@ -64,9 +107,13 @@ export default function DoctorSignUp() {
       if (!formData.email) missingFields.push("email");
       if (!formData.password) missingFields.push("password");
       if (!formData.phone) missingFields.push("phone");
-      
+
       console.log("❌ Missing required fields:", missingFields);
-      dispatch(setError("Please fill in all required fields: " + missingFields.join(", ")));
+      dispatch(
+        setError(
+          "Please fill in all required fields: " + missingFields.join(", ")
+        )
+      );
       return;
     }
 
@@ -76,8 +123,12 @@ export default function DoctorSignUp() {
       return;
     }
 
-    if (formData.password.length < 6) {
-      console.log("❌ Password too short:", formData.password.length, "characters");
+    if (!formData.password || formData.password.length < 6) {
+      console.log(
+        "❌ Password too short:",
+        formData.password?.length || 0,
+        "characters"
+      );
       dispatch(setError("Password must be at least 6 characters"));
       return;
     }
@@ -101,16 +152,31 @@ export default function DoctorSignUp() {
 
       // Check if email already exists in registered users
       const currentState = store.getState();
-      console.log("📊 Current registered users count:", currentState.auth.registeredUsers?.length);
-      console.log("👥 Registered users:", currentState.auth.registeredUsers?.map(u => ({ email: u.email, role: u.role })));
-      
+      console.log(
+        "📊 Current registered users count:",
+        currentState.auth.registeredUsers?.length
+      );
+      console.log(
+        "👥 Registered users:",
+        currentState.auth.registeredUsers?.map((u) => ({
+          email: u.email,
+          role: u.role,
+        }))
+      );
+
       const existingUser = currentState.auth.registeredUsers?.find(
-        (user: User) => user.email.toLowerCase() === formData.email.toLowerCase()
+        (user: User) =>
+          user.email.toLowerCase() === formData.email.toLowerCase()
       );
 
       if (existingUser) {
-        console.log("❌ Email already exists:", existingUser.email, "Role:", existingUser.role);
-        throw new Error('Email already exists');
+        console.log(
+          "❌ Email already exists:",
+          existingUser.email,
+          "Role:",
+          existingUser.role
+        );
+        throw new Error("Email already exists");
       }
 
       // Create new user
@@ -121,12 +187,18 @@ export default function DoctorSignUp() {
         phone: formData.phone,
         password: formData.password,
         role: "doctor",
-        specialization: formData.specialization,
-        licenseNumber: formData.licenseNumber,
-        clinicName: formData.clinicName,
-        clinicAddress: formData.clinicAddress,
-        experience: parseInt(formData.experience) || 0,
-        consultationFee: parseFloat(formData.consultationFee) || 0,
+        petSpecialization: formData.petSpecialization,
+        medicalSpecialty: formData.medicalSpecialty,
+        languages: formData.languages,
+        licenseNumber: formData.licenseNumber || "",
+        clinicName: formData.clinicName || "",
+        clinicAddress: formData.clinicAddress || "",
+        experience: formData.experience
+          ? parseInt(formData.experience, 10) || 0
+          : 0,
+        consultationFee: formData.consultationFee
+          ? parseFloat(formData.consultationFee) || 0
+          : 0,
       };
 
       console.log("👤 Created new doctor user:", {
@@ -134,6 +206,8 @@ export default function DoctorSignUp() {
         name: newUser.name,
         email: newUser.email,
         role: newUser.role,
+        experience: newUser.experience,
+        consultationFee: newUser.consultationFee,
       });
 
       console.log("🚀 Dispatching signupSuccess...");
@@ -154,9 +228,13 @@ export default function DoctorSignUp() {
           message: error.message,
           stack: error.stack,
         });
-        
-        if (error.message === 'Email already exists') {
-          dispatch(setError("Email already registered. Please use a different email or sign in."));
+
+        if (error.message === "Email already exists") {
+          dispatch(
+            setError(
+              "Email already registered. Please use a different email or sign in."
+            )
+          );
         } else {
           dispatch(setError(`Registration failed: ${error.message}`));
         }
@@ -262,21 +340,43 @@ export default function DoctorSignUp() {
           </View>
 
           {/* Professional Information */}
-          <Text className="text-lg font-semibold text-gray-800 mt-6 mb-2">
-            Professional Information
+          <Text className="text-lg font-semibold text-gray-800 mt-6 mb-4">
+            Veterinary Specialization
           </Text>
 
-          <View>
-            <Text className="text-sm font-medium text-gray-700 mb-2">
-              Specialization
-            </Text>
-            <TextInput
-              value={formData.specialization}
-              onChangeText={(value) =>
-                handleInputChange("specialization", value)
-              }
-              placeholder="e.g., Cardiologist, Dermatologist"
-              className="bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-gray-900"
+          {/* Pet Specialization */}
+          <View className="mb-6">
+            <CustomMultiSelect
+              label="Animal Species You Treat"
+              options={petSpeciesOptions}
+              selectedValues={formData.petSpecialization}
+              onSelectionChange={(values) => setFormData(prev => ({ ...prev, petSpecialization: values }))}
+              placeholder="Select animal species..."
+              required
+            />
+          </View>
+
+          {/* Medical Specialty */}
+          <View className="mb-6">
+            <CustomMultiSelect
+              label="Medical Specialties"
+              options={medicalSpecialtyOptions}
+              selectedValues={formData.medicalSpecialty}
+              onSelectionChange={(values) => setFormData(prev => ({ ...prev, medicalSpecialty: values }))}
+              placeholder="Select medical specialties..."
+              required
+              maxSelections={5}
+            />
+          </View>
+
+          {/* Languages */}
+          <View className="mb-6">
+            <CustomMultiSelect
+              label="Languages Spoken"
+              options={languageOptions}
+              selectedValues={formData.languages}
+              onSelectionChange={(values) => setFormData(prev => ({ ...prev, languages: values }))}
+              placeholder="Select languages..."
             />
           </View>
 

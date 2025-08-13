@@ -59,6 +59,8 @@ export default function CreateAppointment() {
       notes: formData.notes,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      doctorId: "",
+      doctorName: "",
     };
 
     dispatch(addAppointment(newAppointment));

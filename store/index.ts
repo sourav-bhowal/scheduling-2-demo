@@ -35,6 +35,7 @@ if (__DEV__) {
     const state = store.getState();
     console.log("🏪 STORE STATE CHANGED:", {
       authRegisteredUsers: state.auth.registeredUsers?.length || 0,
+      authDoctorSlots: state.auth.doctorSlots?.length || 0,
       authIsAuthenticated: state.auth.isAuthenticated,
       authCurrentUser: state.auth.user?.email || null,
       authLoading: state.auth.loading,

@@ -2,7 +2,6 @@ import { Redirect, router } from "expo-router";
 import { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import AuthDebugInfo from "../../components/AuthDebugInfo";
-import QuickTestSignup from "../../components/QuickTestSignup";
 import RoleSelectionModal from "../../components/RoleSelectionModal";
 import { useAppSelector } from "../../store/hooks";
 
@@ -34,7 +33,7 @@ export default function WelcomeScreen() {
           {/* <QuickTestSignup show={true} /> */}
         </>
       )}
-      
+
       <View className="flex-1 justify-center items-center px-6">
         {/* Logo/Title */}
         <View className="items-center mb-16">

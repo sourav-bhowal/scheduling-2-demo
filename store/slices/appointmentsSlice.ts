@@ -1,5 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+export interface ChatMessage {
+  id: string;
+  appointmentId: string;
+  senderId: string;
+  senderName: string;
+  senderRole: 'doctor' | 'patient';
+  message: string;
+  timestamp: string;
+  isRead: boolean;
+}
+
 export interface Appointment {
   id: string;
   title: string;
@@ -9,23 +20,31 @@ export interface Appointment {
   clientName: string;
   clientPhone: string;
   clientEmail?: string;
+  doctorId: string;
+  doctorName: string;
   status: 'scheduled' | 'completed' | 'cancelled';
   serviceType: string;
+  petSpecies?: string; // 'dog', 'cat', 'bird', 'rabbit', 'reptile', 'exotic'
+  petName?: string;
+  petAge?: number;
   duration: number; // in minutes
   price?: number;
   notes?: string;
   createdAt: string;
   updatedAt: string;
+  chatMessages?: ChatMessage[];
 }
 
 interface AppointmentsState {
   appointments: Appointment[];
+  chatMessages: ChatMessage[];
   loading: boolean;
   error: string | null;
   selectedDate: string;
   filters: {
     status: 'all' | 'scheduled' | 'completed' | 'cancelled';
     serviceType: string;
+    petSpecies: string;
     dateRange: {
       start: string;
       end: string;
@@ -35,12 +54,14 @@ interface AppointmentsState {
 
 const initialState: AppointmentsState = {
   appointments: [],
+  chatMessages: [],
   loading: false,
   error: null,
   selectedDate: new Date().toISOString().split('T')[0],
   filters: {
     status: 'all',
     serviceType: '',
+    petSpecies: '',
     dateRange: {
       start: '',
       end: '',
@@ -98,6 +119,36 @@ const appointmentsSlice = createSlice({
     setAppointments: (state, action: PayloadAction<Appointment[]>) => {
       state.appointments = action.payload;
     },
+    // Chat message actions
+    addChatMessage: (state, action: PayloadAction<ChatMessage>) => {
+      state.chatMessages.push(action.payload);
+      // Also add to the specific appointment's chat messages
+      const appointment = state.appointments.find(apt => apt.id === action.payload.appointmentId);
+      if (appointment) {
+        if (!appointment.chatMessages) {
+          appointment.chatMessages = [];
+        }
+        appointment.chatMessages.push(action.payload);
+      }
+    },
+    markMessagesAsRead: (state, action: PayloadAction<{ appointmentId: string; userId: string }>) => {
+      const { appointmentId, userId } = action.payload;
+      // Mark messages as read in global chat messages
+      state.chatMessages.forEach(msg => {
+        if (msg.appointmentId === appointmentId && msg.senderId !== userId) {
+          msg.isRead = true;
+        }
+      });
+      // Mark messages as read in appointment-specific messages
+      const appointment = state.appointments.find(apt => apt.id === appointmentId);
+      if (appointment?.chatMessages) {
+        appointment.chatMessages.forEach(msg => {
+          if (msg.senderId !== userId) {
+            msg.isRead = true;
+          }
+        });
+      }
+    },
     resetAllAppointmentsState: (state) => {
       // Reset to initial state
       return initialState;
@@ -116,6 +167,8 @@ export const {
   setFilters,
   clearFilters,
   setAppointments,
+  addChatMessage,
+  markMessagesAsRead,
   resetAllAppointmentsState,
 } = appointmentsSlice.actions;
 
