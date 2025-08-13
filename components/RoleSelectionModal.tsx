@@ -68,11 +68,11 @@ export default function RoleSelectionModal({
 
         <Animated.View
           style={{ transform: [{ scale: scaleAnim }] }}
-          className="bg-blue-500 rounded-3xl mx-6 p-8 shadow-2xl min-w-[320px] max-w-[400px]"
+          className="bg-blue-500 rounded-3xl mx-6 p-8 shadow-2xl min-w-[320px] max-w-[400px] flex flex-col gap-10"
         >
           {/* Header */}
-          <View className="items-center mb-8">
-            <View className="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-2xl items-center justify-center mb-4">
+          <View className="items-center">
+            <View className="w-16 h-16 bg-white rounded-2xl items-center justify-center mb-4">
               <Text className="text-2xl">🏥</Text>
             </View>
             <Text className="text-2xl font-bold text-white mb-2">
@@ -84,7 +84,7 @@ export default function RoleSelectionModal({
           </View>
 
           {/* Role Options */}
-          <View className="flex flex-col gap-5">
+          <View className="flex flex-col gap-2">
             {/* Doctor Option */}
             <TouchableOpacity
               onPress={() => onSelectRole("doctor")}
@@ -102,7 +102,7 @@ export default function RoleSelectionModal({
                     Manage patients & appointments
                   </Text>
                 </View>
-                <View className="w-8 h-8  rounded-full items-center justify-center">
+                <View className="w-8 h-8 rounded-full items-center justify-center">
                   <Text className=" font-bold">→</Text>
                 </View>
               </View>
@@ -133,7 +133,7 @@ export default function RoleSelectionModal({
           {/* Cancel Button */}
           <TouchableOpacity
             onPress={onClose}
-            className="mt-8 py-4 px-6 bg-white rounded-2xl active:bg-gray-200"
+            className="py-4 px-6 bg-white rounded-2xl active:bg-gray-200"
           >
             <Text className="text-red-500 text-center font-semibold text-base">
               Cancel

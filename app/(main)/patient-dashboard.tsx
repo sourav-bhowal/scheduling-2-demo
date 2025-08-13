@@ -14,7 +14,7 @@ export default function PatientDashboard() {
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
 
   if (!user || user.role !== "patient") {
-    return <Link href="/welcome" replace />;
+    return <Link href="/(main)/welcome" replace />;
   }
 
   // Filter appointments for current patient only
@@ -34,7 +34,7 @@ export default function PatientDashboard() {
 
   const handleLogout = () => {
     dispatch(logout());
-    router.replace("/welcome");
+    router.replace("/(main)/welcome");
   };
 
   const openChat = (appointmentId: string) => {

@@ -17,40 +17,14 @@ export default function RootLayout() {
   return (
     <Provider store={store}>
       <PersistGate loading={<LoadingComponent />} persistor={persistor}>
-        <Stack 
+        <Stack
           screenOptions={{
-            headerShown: false, // Hide headers by default
+            headerShown: false,
           }}
         >
-          <Stack.Screen name="welcome" options={{ headerShown: false }} />
-          <Stack.Screen name="doctor-signin" options={{ headerShown: false }} />
-          <Stack.Screen name="doctor-signup" options={{ headerShown: false }} />
-          <Stack.Screen name="patient-signin" options={{ headerShown: false }} />
-          <Stack.Screen name="patient-signup" options={{ headerShown: false }} />
-          <Stack.Screen name="doctor-dashboard" options={{ headerShown: false }} />
-          <Stack.Screen name="patient-dashboard" options={{ headerShown: false }} />
-          <Stack.Screen name="manage-availability" options={{ headerShown: false }} />
-          <Stack.Screen name="book-appointment" options={{ headerShown: false }} />
-          <Stack.Screen 
-            name="appointments" 
-            options={{ 
-              headerShown: true,
-              title: "All Appointments",
-              headerStyle: { backgroundColor: '#3b82f6' },
-              headerTintColor: '#fff',
-              headerTitleStyle: { fontWeight: 'bold' }
-            }} 
-          />
-          <Stack.Screen 
-            name="create-appointment" 
-            options={{ 
-              headerShown: true,
-              title: "Create Appointment",
-              headerStyle: { backgroundColor: '#3b82f6' },
-              headerTintColor: '#fff',
-              headerTitleStyle: { fontWeight: 'bold' }
-            }} 
-          />
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="(main)" options={{ headerShown: false }} />
         </Stack>
       </PersistGate>
     </Provider>

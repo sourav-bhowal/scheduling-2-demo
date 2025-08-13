@@ -24,7 +24,7 @@ export default function WelcomeScreen() {
   };
 
   return (
-    <View className="flex-1 bg-neutral-200">
+    <View className="flex-1 bg-blue-200">
       {/* Debug components for testing */}
       {/* {__DEV__ && (
         <>
@@ -36,7 +36,7 @@ export default function WelcomeScreen() {
       <View className="flex-1 justify-center items-center px-6">
         {/* Logo/Title */}
         <View className="items-center mb-16">
-          <View className="w-24 h-24 bg-white/20 rounded-3xl items-center justify-center mb-6">
+          <View className="w-24 h-24 bg-white rounded-3xl items-center justify-center mb-6">
             <Text className="text-4xl">🏥</Text>
           </View>
           <Text className="text-5xl font-bold text-black mb-4">
@@ -77,7 +77,7 @@ export default function WelcomeScreen() {
 
         {/* Features */}
         <View className="mt-16 space-y-3">
-          <View className="flex-row items-center justify-between">
+          <View className="flex-row ">
             <Text className="text-blue-500 text-sm">✓ Secure & Private</Text>
             <Text className="text-blue-500 text-sm">✓ Real-time Updates</Text>
             <Text className="text-blue-500 text-sm">✓ Easy to Use</Text>
