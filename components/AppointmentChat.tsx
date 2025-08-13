@@ -34,7 +34,7 @@ export default function AppointmentChat({
 
   const appointment = appointments.find((apt) => apt.id === appointmentId);
   const appointmentMessages = chatMessages
-    .filter((msg) => msg.appointmentId === appointmentId)
+    ?.filter((msg) => msg.appointmentId === appointmentId)
     .sort(
       (a, b) =>
         new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
@@ -96,7 +96,7 @@ export default function AppointmentChat({
 
       {/* Messages */}
       <ScrollView className="flex-1 px-4 py-2">
-        {appointmentMessages.length === 0 ? (
+        {appointmentMessages?.length === 0 ? (
           <View className="flex-1 items-center justify-center py-8">
             <Text className="text-gray-500 text-center">
               Start a conversation with {otherParticipant.name}
@@ -106,7 +106,7 @@ export default function AppointmentChat({
             </Text>
           </View>
         ) : (
-          appointmentMessages.map((msg) => (
+          appointmentMessages?.map((msg) => (
             <View
               key={msg.id}
               className={`mb-4 ${msg.senderId === user?.id ? "items-end" : "items-start"}`}

@@ -134,7 +134,7 @@ const appointmentsSlice = createSlice({
     markMessagesAsRead: (state, action: PayloadAction<{ appointmentId: string; userId: string }>) => {
       const { appointmentId, userId } = action.payload;
       // Mark messages as read in global chat messages
-      state.chatMessages.forEach(msg => {
+      state.chatMessages?.forEach(msg => {
         if (msg.appointmentId === appointmentId && msg.senderId !== userId) {
           msg.isRead = true;
         }
@@ -142,7 +142,7 @@ const appointmentsSlice = createSlice({
       // Mark messages as read in appointment-specific messages
       const appointment = state.appointments.find(apt => apt.id === appointmentId);
       if (appointment?.chatMessages) {
-        appointment.chatMessages.forEach(msg => {
+        appointment.chatMessages?.forEach(msg => {
           if (msg.senderId !== userId) {
             msg.isRead = true;
           }

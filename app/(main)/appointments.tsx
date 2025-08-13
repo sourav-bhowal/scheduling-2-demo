@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import AppointmentChat from "../../components/AppointmentChat";
 import ChatNotificationBadge from "../../components/ChatNotificationBadge";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -15,7 +16,6 @@ import {
   setFilters,
   updateAppointmentStatus,
 } from "../../store/slices/appointmentsSlice";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Appointments() {
   const dispatch = useAppDispatch();
@@ -30,10 +30,11 @@ export default function Appointments() {
   >(null);
 
   // Filter appointments based on current filters and search
-  const filteredAppointments = appointments.filter((apt) => {
+  const filteredAppointments = (appointments || []).filter((apt) => {
+    if (!apt) return false; // Additional safety check
     const matchesSearch =
-      apt.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      apt.title.toLowerCase().includes(searchQuery.toLowerCase());
+      (apt.clientName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (apt.title || '').toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus =
       filters.status === "all" || apt.status === filters.status;
     return matchesSearch && matchesStatus;

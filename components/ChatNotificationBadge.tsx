@@ -12,12 +12,12 @@ export default function ChatNotificationBadge({
 }: ChatNotificationBadgeProps) {
   const { chatMessages } = useAppSelector((state) => state.appointments);
 
-  const unreadCount = chatMessages.filter(
+  const unreadCount = chatMessages?.filter(
     (msg) =>
       msg.appointmentId === appointmentId &&
       msg.senderId !== currentUserId &&
       !msg.isRead
-  ).length;
+  )?.length;
 
   if (unreadCount === 0) {
     return null;

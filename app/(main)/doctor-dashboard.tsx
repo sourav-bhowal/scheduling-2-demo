@@ -1,11 +1,12 @@
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import { Modal, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import AppointmentChat from "../../components/AppointmentChat";
 import ChatNotificationBadge from "../../components/ChatNotificationBadge";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { resetAllAppointmentsState } from "../../store/slices/appointmentsSlice";
 import { logout } from "../../store/slices/authSlice";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function DoctorDashboard() {
   const { user, doctorSlots } = useAppSelector((state) => state.auth);
@@ -17,7 +18,7 @@ export default function DoctorDashboard() {
   >(null);
 
   if (!user || user.role !== "doctor") {
-    return <Link href="/welcome" replace />;
+    return <Link href="/(main)/welcome" replace />;
   }
 
   // Filter appointments for current doctor only
@@ -41,6 +42,7 @@ export default function DoctorDashboard() {
 
   const handleLogout = () => {
     dispatch(logout());
+    dispatch(resetAllAppointmentsState());
     router.replace("/(main)/welcome");
   };
 
@@ -115,7 +117,7 @@ export default function DoctorDashboard() {
           <Text className="text-xl font-bold text-gray-800 mb-4">
             Quick Actions
           </Text>
-          <View className="space-y-3">
+          <View className="flex flex-col gap-3">
             <Link href="/manage-availability" asChild>
               <TouchableOpacity className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex-row items-center">
                 <View className="w-12 h-12 bg-blue-100 rounded-lg items-center justify-center mr-4">

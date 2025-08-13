@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import RoleSelectionModal from "../../components/RoleSelectionModal";
 import { useAppSelector } from "../../store/hooks";
+import AuthDebugInfo from "@/components/AuthDebugInfo";
 
 export default function WelcomeScreen() {
   const { isAuthenticated } = useAppSelector((state) => state.auth);
@@ -26,12 +27,12 @@ export default function WelcomeScreen() {
   return (
     <View className="flex-1 bg-blue-200">
       {/* Debug components for testing */}
-      {/* {__DEV__ && (
+      {__DEV__ && (
         <>
           <AuthDebugInfo show={true} />
           {/* <QuickTestSignup show={true} /> */}
-        {/* </>
-      )} */}
+        </>
+      )}
 
       <View className="flex-1 justify-center items-center px-6">
         {/* Logo/Title */}
