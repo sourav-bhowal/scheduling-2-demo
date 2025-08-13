@@ -1,22 +1,21 @@
 import { store } from "@/store";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
-    clearError,
-    setError,
-    setLoading,
-    signupSuccess,
-    User,
+  clearError,
+  setError,
+  setLoading,
+  signupSuccess,
+  User,
 } from "@/store/slices/authSlice";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import {
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import AuthDebugInfo from "../../components/AuthDebugInfo";
 import CustomDatePicker from "../../components/CustomDatePicker";
 import CustomDropdown from "../../components/CustomDropdown";
 
@@ -255,7 +254,7 @@ export default function PatientSignUp() {
 
   return (
     <ScrollView className="flex-1 bg-white">
-      <AuthDebugInfo show={true} />
+      {/* <AuthDebugInfo show={true} /> */}
       <View className="flex-1 px-6 py-8">
         {/* Header */}
         <View className="items-center mb-6">

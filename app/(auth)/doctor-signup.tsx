@@ -16,7 +16,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import AuthDebugInfo from "../../components/AuthDebugInfo";
 import CustomMultiSelect from "../../components/CustomMultiSelect";
 
 export default function DoctorSignUp() {
@@ -250,7 +249,7 @@ export default function DoctorSignUp() {
 
   return (
     <ScrollView className="flex-1 bg-white">
-      <AuthDebugInfo show={true} />
+      {/* <AuthDebugInfo show={true} /> */}
       <View className="flex-1 px-6 py-8">
         {/* Header */}
         <View className="items-center mb-6">

@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import CustomDropdown from "../../components/CustomDropdown";
-import SlotsDebugInfo from "../../components/SlotsDebugInfo";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   addAppointment,
@@ -172,7 +171,7 @@ export default function BookAppointment() {
   return (
     <ScrollView className="flex-1 bg-gray-50">
       {/* Debug Info - Remove this after testing */}
-      <SlotsDebugInfo />
+      {/* <SlotsDebugInfo /> */}
 
       {/* Header */}
       <View className="bg-green-500 pt-12 pb-6 px-4">
