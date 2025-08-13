@@ -1,5 +1,8 @@
 import { Link, router } from "expo-router";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
+import { Modal, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import AppointmentChat from "../../components/AppointmentChat";
+import ChatNotificationBadge from "../../components/ChatNotificationBadge";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { logout } from "../../store/slices/authSlice";
 
@@ -7,6 +10,8 @@ export default function PatientDashboard() {
   const { user } = useAppSelector((state) => state.auth);
   const { appointments } = useAppSelector((state) => state.appointments);
   const dispatch = useAppDispatch();
+  const [chatModalVisible, setChatModalVisible] = useState(false);
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
 
   if (!user || user.role !== "patient") {
     return <Link href="/welcome" replace />;
@@ -30,6 +35,16 @@ export default function PatientDashboard() {
   const handleLogout = () => {
     dispatch(logout());
     router.replace("/welcome");
+  };
+
+  const openChat = (appointmentId: string) => {
+    setSelectedAppointmentId(appointmentId);
+    setChatModalVisible(true);
+  };
+
+  const closeChat = () => {
+    setChatModalVisible(false);
+    setSelectedAppointmentId(null);
   };
 
   return (
@@ -80,7 +95,7 @@ export default function PatientDashboard() {
           Quick Actions
         </Text>
         <View className="space-y-3">
-          <Link href="/book-appointment" asChild>
+          <Link href="/(main)/book-appointment" asChild>
             <TouchableOpacity className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex-row items-center">
               <View className="w-12 h-12 bg-green-100 rounded-lg items-center justify-center mr-4">
                 <Text className="text-2xl">📅</Text>
@@ -97,7 +112,7 @@ export default function PatientDashboard() {
             </TouchableOpacity>
           </Link>
 
-          <Link href="/appointments" asChild>
+          <Link href="/(main)/appointments" asChild>
             <TouchableOpacity className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex-row items-center">
               <View className="w-12 h-12 bg-blue-100 rounded-lg items-center justify-center mr-4">
                 <Text className="text-2xl">📋</Text>
@@ -170,24 +185,56 @@ export default function PatientDashboard() {
                 className="bg-white p-4 rounded-lg border border-gray-200"
               >
                 <View className="flex-row justify-between items-start mb-2">
-                  <Text className="font-semibold text-gray-800">
-                    {appointment.title}
-                  </Text>
-                  <Text className="text-green-600 font-medium">
-                    {appointment.time}
-                  </Text>
+                  <View className="flex-1">
+                    <Text className="font-semibold text-gray-800">
+                      {appointment.title}
+                    </Text>
+                    <Text className="text-gray-600 text-sm mb-1">
+                      {appointment.date}
+                    </Text>
+                    <Text className="text-gray-500 text-xs">
+                      {appointment.serviceType} • {appointment.duration} min
+                    </Text>
+                  </View>
+                  <View className="items-end">
+                    <Text className="text-green-600 font-medium mb-2">
+                      {appointment.time}
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() => openChat(appointment.id)}
+                      className="bg-blue-500 px-3 py-1 rounded-full relative"
+                    >
+                      <Text className="text-white text-xs font-medium">
+                        💬 Chat
+                      </Text>
+                      {user && (
+                        <ChatNotificationBadge
+                          appointmentId={appointment.id}
+                          currentUserId={user.id}
+                        />
+                      )}
+                    </TouchableOpacity>
+                  </View>
                 </View>
-                <Text className="text-gray-600 text-sm mb-1">
-                  {appointment.date}
-                </Text>
-                <Text className="text-gray-500 text-xs">
-                  {appointment.serviceType} • {appointment.duration} min
-                </Text>
               </View>
             ))}
           </View>
         )}
       </View>
+
+      {/* Chat Modal */}
+      <Modal
+        visible={chatModalVisible}
+        animationType="slide"
+        presentationStyle="fullScreen"
+      >
+        {selectedAppointmentId && (
+          <AppointmentChat
+            appointmentId={selectedAppointmentId}
+            onClose={closeChat}
+          />
+        )}
+      </Modal>
     </ScrollView>
   );
 }

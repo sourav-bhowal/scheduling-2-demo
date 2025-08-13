@@ -1,12 +1,15 @@
 import { Link } from "expo-router";
 import { useState } from "react";
 import {
+  Modal,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import AppointmentChat from "../../components/AppointmentChat";
+import ChatNotificationBadge from "../../components/ChatNotificationBadge";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   setFilters,
@@ -15,10 +18,13 @@ import {
 
 export default function Appointments() {
   const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state) => state.auth);
   const { appointments, filters } = useAppSelector(
     (state) => state.appointments
   );
   const [searchQuery, setSearchQuery] = useState("");
+  const [chatModalVisible, setChatModalVisible] = useState(false);
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
 
   // Filter appointments based on current filters and search
   const filteredAppointments = appointments.filter((apt) => {
@@ -41,6 +47,16 @@ export default function Appointments() {
     status: "all" | "scheduled" | "completed" | "cancelled"
   ) => {
     dispatch(setFilters({ status }));
+  };
+
+  const openChat = (appointmentId: string) => {
+    setSelectedAppointmentId(appointmentId);
+    setChatModalVisible(true);
+  };
+
+  const closeChat = () => {
+    setChatModalVisible(false);
+    setSelectedAppointmentId(null);
   };
 
   return (
@@ -193,17 +209,47 @@ export default function Appointments() {
                         </Text>
                       </TouchableOpacity>
                     </View>
-                    {appointment.price && (
-                      <Text className="text-gray-900 font-semibold">
-                        ${appointment.price}
-                      </Text>
-                    )}
+                    <View className="flex-row items-center space-x-2">
+                      {appointment.price && (
+                        <Text className="text-gray-900 font-semibold">
+                          ${appointment.price}
+                        </Text>
+                      )}
+                      <TouchableOpacity
+                        onPress={() => openChat(appointment.id)}
+                        className="bg-green-500 px-3 py-1 rounded-full relative"
+                      >
+                        <Text className="text-white text-xs font-medium">
+                          💬 Chat
+                        </Text>
+                        {user && (
+                          <ChatNotificationBadge
+                            appointmentId={appointment.id}
+                            currentUserId={user.id}
+                          />
+                        )}
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
               ))}
           </View>
         )}
       </ScrollView>
+
+      {/* Chat Modal */}
+      <Modal
+        visible={chatModalVisible}
+        animationType="slide"
+        presentationStyle="fullScreen"
+      >
+        {selectedAppointmentId && (
+          <AppointmentChat
+            appointmentId={selectedAppointmentId}
+            onClose={closeChat}
+          />
+        )}
+      </Modal>
 
       {/* Bottom Navigation */}
       <View className="flex-row bg-white border-t border-gray-200 px-4 py-3">

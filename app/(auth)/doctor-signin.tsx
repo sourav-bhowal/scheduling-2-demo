@@ -46,7 +46,7 @@ export default function DoctorSignIn() {
           currentState.auth.isAuthenticated &&
           currentState.auth.user?.role === "doctor"
         ) {
-          router.replace("/doctor-dashboard");
+          router.replace("/(main)/doctor-dashboard");
         } else if (!currentState.auth.error) {
           dispatch(setError("Access denied. Doctor account required."));
         }
@@ -128,7 +128,7 @@ export default function DoctorSignIn() {
         <View className="mt-8">
           <View className="flex-row justify-center items-center">
             <Text className="text-gray-600">Don&apos;t have an account? </Text>
-            <Link href="/doctor-signup" asChild>
+            <Link href="/(auth)/doctor-signup" asChild>
               <TouchableOpacity>
                 <Text className="text-blue-500 font-semibold">Sign Up</Text>
               </TouchableOpacity>
@@ -136,7 +136,7 @@ export default function DoctorSignIn() {
           </View>
 
           <View className="mt-6">
-            <Link href="/welcome" asChild>
+            <Link href="/(main)/welcome" asChild>
               <TouchableOpacity className="py-2">
                 <Text className="text-gray-500 text-center">
                   ← Back to Role Selection

@@ -5,17 +5,17 @@ export default function Index() {
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
 
   if (!isAuthenticated) {
-    return <Redirect href="/welcome" />;
+    return <Redirect href="/(main)/welcome" />;
   }
 
   if (user?.role === 'doctor') {
-    return <Redirect href="/doctor-dashboard" />;
+    return <Redirect href="/(main)/doctor-dashboard" />;
   }
 
   if (user?.role === 'patient') {
-    return <Redirect href="/patient-dashboard" />;
+    return <Redirect href="/(main)/patient-dashboard" />;
   }
 
   // Fallback to welcome screen
-  return <Redirect href="/welcome" />;
+  return <Redirect href="/(main)/welcome" />;
 }
