@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { logout } from "../../store/slices/authSlice";
 
 export default function PatientDashboard() {
-  const { user, availableSlots } = useAppSelector((state) => state.auth);
+  const { user } = useAppSelector((state) => state.auth);
   const { appointments } = useAppSelector((state) => state.appointments);
   const dispatch = useAppDispatch();
 
@@ -12,10 +12,19 @@ export default function PatientDashboard() {
     return <Link href="/welcome" replace />;
   }
 
-  const upcomingAppointments = (appointments || []).filter(
+  // Filter appointments for current patient only
+  const myAppointments = (appointments || []).filter(
+    (apt) => apt.clientEmail === user.email
+  );
+
+  const upcomingAppointments = myAppointments.filter(
     (apt) =>
       apt.date >= new Date().toISOString().split("T")[0] &&
       apt.status === "scheduled"
+  );
+
+  const completedAppointments = myAppointments.filter(
+    (apt) => apt.status === "completed"
   );
 
   const handleLogout = () => {
@@ -48,19 +57,19 @@ export default function PatientDashboard() {
             <Text className="text-white text-lg font-semibold">
               {upcomingAppointments?.length || 0}
             </Text>
-            <Text className="text-white/80">Upcoming Appointments</Text>
+            <Text className="text-white/80">Upcoming</Text>
           </View>
           <View className="bg-white/20 rounded-lg p-3 flex-1 mx-1">
             <Text className="text-white text-lg font-semibold">
-              {(availableSlots || []).length}
+              {completedAppointments?.length || 0}
             </Text>
-            <Text className="text-white/80">Available Slots</Text>
+            <Text className="text-white/80">Completed</Text>
           </View>
           <View className="bg-white/20 rounded-lg p-3 flex-1 ml-2">
             <Text className="text-white text-lg font-semibold">
-              {user.medicalHistory?.length || 0}
+              {user.pets?.length || 0}
             </Text>
-            <Text className="text-white/80">Conditions</Text>
+            <Text className="text-white/80">My Pets</Text>
           </View>
         </View>
       </View>

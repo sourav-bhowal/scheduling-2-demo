@@ -12,10 +12,25 @@ export default function DoctorDashboard() {
     return <Link href="/welcome" replace />;
   }
 
-  const todayAppointments = (appointments || []).filter(
+  // Filter appointments for current doctor only
+  const myAppointments = (appointments || []).filter(
+    (apt) => apt.doctorId === user.id
+  );
+
+  const todayAppointments = myAppointments.filter(
     (apt) =>
       apt.date === new Date().toISOString().split("T")[0] &&
       apt.status === "scheduled"
+  );
+
+  const upcomingAppointments = myAppointments.filter(
+    (apt) =>
+      new Date(apt.date) > new Date() &&
+      apt.status === "scheduled"
+  );
+
+  const completedAppointments = myAppointments.filter(
+    (apt) => apt.status === "completed"
   );
 
   const handleLogout = () => {
@@ -44,24 +59,32 @@ export default function DoctorDashboard() {
         </View>
 
         {/* Stats */}
-        <View className="flex-row justify-between">
+        <View className="flex-row justify-between mb-3">
           <View className="bg-white/20 rounded-lg p-3 flex-1 mr-2">
             <Text className="text-white text-lg font-semibold">
               {todayAppointments?.length || 0}
             </Text>
-            <Text className="text-white/80">Today&apos;s Appointments</Text>
-          </View>
-          <View className="bg-white/20 rounded-lg p-3 flex-1 mx-1">
-            <Text className="text-white text-lg font-semibold">
-              {(doctorSlots || []).length}
-            </Text>
-            <Text className="text-white/80">Available Slots</Text>
+            <Text className="text-white/80">Today</Text>
           </View>
           <View className="bg-white/20 rounded-lg p-3 flex-1 ml-2">
             <Text className="text-white text-lg font-semibold">
-              ${user.consultationFee}
+              {upcomingAppointments?.length || 0}
             </Text>
-            <Text className="text-white/80">Consultation Fee</Text>
+            <Text className="text-white/80">Upcoming</Text>
+          </View>
+        </View>
+        <View className="flex-row justify-between">
+          <View className="bg-white/20 rounded-lg p-3 flex-1 mr-2">
+            <Text className="text-white text-lg font-semibold">
+              {completedAppointments?.length || 0}
+            </Text>
+            <Text className="text-white/80">Completed</Text>
+          </View>
+          <View className="bg-white/20 rounded-lg p-3 flex-1 ml-2">
+            <Text className="text-white text-lg font-semibold">
+              {(doctorSlots || []).filter(slot => slot.doctorId === user.id && slot.isAvailable).length}
+            </Text>
+            <Text className="text-white/80">Available Slots</Text>
           </View>
         </View>
       </View>
