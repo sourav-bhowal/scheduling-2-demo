@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import AppointmentChat from "../../components/AppointmentChat";
 import ChatNotificationBadge from "../../components/ChatNotificationBadge";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { resetAllAppointmentsState } from "../../store/slices/appointmentsSlice";
+import { clearChatMessages } from "../../store/slices/appointmentsSlice";
 import { logout } from "../../store/slices/authSlice";
 
 export default function DoctorDashboard() {
@@ -42,7 +42,7 @@ export default function DoctorDashboard() {
 
   const handleLogout = () => {
     dispatch(logout());
-    dispatch(resetAllAppointmentsState());
+    dispatch(clearChatMessages()); // Only clear chat messages, keep appointments
     router.replace("/(main)/welcome");
   };
 

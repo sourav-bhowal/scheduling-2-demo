@@ -4,7 +4,7 @@ import { Modal, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import AppointmentChat from "../../components/AppointmentChat";
 import ChatNotificationBadge from "../../components/ChatNotificationBadge";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { resetAllAppointmentsState } from "../../store/slices/appointmentsSlice";
+import { clearChatMessages } from "../../store/slices/appointmentsSlice";
 import { logout } from "../../store/slices/authSlice";
 
 export default function PatientDashboard() {
@@ -37,7 +37,7 @@ export default function PatientDashboard() {
 
   const handleLogout = () => {
     dispatch(logout());
-    dispatch(resetAllAppointmentsState());
+    dispatch(clearChatMessages()); // Only clear chat messages, keep appointments
     router.replace("/(main)/welcome");
   };
 

@@ -1,6 +1,6 @@
 import { store } from "@/store";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { resetAllAppointmentsState } from "@/store/slices/appointmentsSlice";
+import { clearChatMessages } from "@/store/slices/appointmentsSlice";
 import {
   authenticateUser,
   clearError,
@@ -40,8 +40,8 @@ export default function DoctorSignIn() {
       // Use Redux store authentication
       dispatch(authenticateUser({ email, password }));
       
-      // Clear any previous user's appointment data
-      dispatch(resetAllAppointmentsState());
+      // Clear any previous user's chat messages (but keep appointments)
+      dispatch(clearChatMessages());
 
       // Check if authentication was successful
       // We'll need to check the auth state after dispatch

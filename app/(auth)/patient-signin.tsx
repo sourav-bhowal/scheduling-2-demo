@@ -1,20 +1,20 @@
 import { store } from "@/store";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { resetAllAppointmentsState } from "@/store/slices/appointmentsSlice";
+import { clearChatMessages } from "@/store/slices/appointmentsSlice";
 import {
-  authenticateUser,
-  clearError,
-  setError,
-  setLoading,
+    authenticateUser,
+    clearError,
+    setError,
+    setLoading,
 } from "@/store/slices/authSlice";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import {
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -40,8 +40,8 @@ export default function PatientSignIn() {
       // Use Redux store authentication
       dispatch(authenticateUser({ email, password }));
       
-      // Clear any previous user's appointment data
-      dispatch(resetAllAppointmentsState());
+      // Clear any previous user's chat messages (but keep appointments)
+      dispatch(clearChatMessages());
 
       // Check if authentication was successful
       setTimeout(() => {

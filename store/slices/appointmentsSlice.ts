@@ -153,6 +153,16 @@ const appointmentsSlice = createSlice({
       // Reset to initial state
       return initialState;
     },
+    clearChatMessages: (state) => {
+      // Only clear chat messages, keep appointments
+      state.chatMessages = [];
+      // Also clear chat messages from individual appointments
+      state.appointments.forEach(appointment => {
+        if (appointment.chatMessages) {
+          appointment.chatMessages = [];
+        }
+      });
+    },
   },
 });
 
@@ -170,6 +180,7 @@ export const {
   addChatMessage,
   markMessagesAsRead,
   resetAllAppointmentsState,
+  clearChatMessages,
 } = appointmentsSlice.actions;
 
 export default appointmentsSlice.reducer;
