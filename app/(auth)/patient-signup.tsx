@@ -463,7 +463,7 @@ export default function PatientSignUp() {
                 </View>
 
                 <View className="space-y-3">
-                  <View className="flex-row gap-3">
+                  <View className="flex-col gap-3">
                     <View className="flex-1">
                       <Text className="text-sm font-medium text-gray-700 mb-1">
                         Pet Name *
@@ -500,7 +500,7 @@ export default function PatientSignUp() {
                     </View>
                   </View>
 
-                  <View className="flex-row gap-3">
+                  <View className="flex-row gap-3 mt-3">
                     <View className="flex-1">
                       <Text className="text-sm font-medium text-gray-700 mb-1">
                         Breed

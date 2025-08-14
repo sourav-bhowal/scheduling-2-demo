@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
-  addChatMessage,
-  ChatMessage,
-  markMessagesAsRead,
+    addChatMessage,
+    ChatMessage,
+    markMessagesAsRead,
 } from "../store/slices/appointmentsSlice";
 
 interface AppointmentChatProps {
@@ -32,9 +32,9 @@ export default function AppointmentChat({
 
   const [message, setMessage] = useState("");
 
-  const appointment = appointments.find((apt) => apt.id === appointmentId);
-  const appointmentMessages = chatMessages
-    ?.filter((msg) => msg.appointmentId === appointmentId)
+  const appointment = (appointments || []).find((apt) => apt.id === appointmentId);
+  const appointmentMessages = (chatMessages || [])
+    .filter((msg) => msg.appointmentId === appointmentId)
     .sort(
       (a, b) =>
         new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
